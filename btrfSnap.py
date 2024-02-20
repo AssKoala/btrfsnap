@@ -74,7 +74,7 @@ def test_TTL():
     new_str = TTL.from_str(str)
     print(new_str)
 
-test_TTL()
+#test_TTL()
 
 #####################
 # Individual Commands
@@ -95,53 +95,6 @@ def handle_destroy(parsed_args):
 def handle_create(parsed_args):
     if parsed_args.verbose:
         print(f"Creating snapshot for path: {parsed_args.btrfs_path}")
-
-#####################
-# Helpers
-def create_TTL_string(Years, Months, Weeks, Days, Hours, Minutes, Seconds):
-    str = ""
-    if (Years > 0):
-        str += f"{Years}y"
-    if (Months > 0):
-        str += f"{Months}m"
-    if (Weeks > 0):
-        str += f"{Weeks}w"
-    if (Days > 0):
-        str += f"{Days}d"
-    if (Hours > 0):
-        str += f"{Hours}h"
-    if (Minutes > 0):
-        str += f"{Minutes}M"
-    if (Seconds > 0):
-        str += f"{Seconds}s"
-
-    return str
-
-def convert_TTL_to_Seconds(TTL_str):
-    ttl_in_sec = 0.0
-
-    if ('y' in TTL_str):
-        years = TTL_str.split('y',1)
-        ttl_in_sec += float(years)
-
-    if ('m' in TTL_str):
-        months = TTL_str.split('m',1)
-    
-    if ('w' in TTL_str):
-        weeks = TTL_str.split('w',1)
-    
-    if ('d' in TTL_str):
-        days = TTL_str.split('d',1)
-    
-    if ('M' in TTL_str):
-        minutes = TTL_str.split('M',1)
-    
-    if ('s' in TTL_str):
-        Seconds = TTL_str.split('s',1)
-
-   
-
-
 
 #####################
 # Main
@@ -183,7 +136,7 @@ parser.add_argument('-s','--snapshot-folder',
 parser.add_argument('-a','--automatic-lifetime',
                     required=False,
                     default='1m',
-                    help="Automatic lifetime for the snapshot.  Defaults to 1m")
+                    help="TTL formatted automatic lifetime for the snapshot.  Defaults to 1m.  See TTL definition")
 parser.add_argument('-p', '--prefix',
                     required=False,
                     help="Prefix to prepend to snapshot names (e.g. MyPrefix-1m)")
