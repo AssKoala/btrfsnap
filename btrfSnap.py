@@ -3,14 +3,88 @@ import pathlib
 import subprocess
 
 #####################
+# TTL Management
+class TTL:
+    def __init__(self,Years, Months, Weeks, Days, Hours, Minutes, Seconds):
+        self.years = Years
+        self.months = Months
+        self.weeks = Weeks
+        self.days = Days
+        self.hours = Hours
+        self.minutes = Minutes
+        self.seconds = Seconds
+    
+    def __str__(self):
+        return f"{self.years}y{self.months}m{self.weeks}w{self.days}d{self.hours}h{self.minutes}M{self.seconds}s"
+
+    @staticmethod
+    def from_str(str):
+        curr = ""
+        
+        accumulate = []
+
+        for index,item in enumerate(str, start=0):
+            if (item.isdigit()):
+                curr += item
+            elif (item.isalpha()):
+                num = int(curr)
+                tag = item
+                accumulate.append((num, tag))
+                curr = ""
+            else:
+                raise ValueError
+
+        TTL_toret = TTL(0,0,0,0,0,0,0)
+
+        for item in accumulate:
+            match item[1]:
+                case 'y':
+                    if (TTL_toret.years != 0):
+                        raise ValueError
+                    TTL_toret.years = int(item[0])
+                case 'm':
+                    if (TTL_toret.months != 0):
+                        raise ValueError
+                    TTL_toret.months = int(item[0])
+                case 'w':
+                    if (TTL_toret.weeks != 0):
+                        raise ValueError
+                    TTL_toret.weeks = int(item[0])
+                case 'd':
+                    if (TTL_toret.days != 0):
+                        raise ValueError
+                    TTL_toret.days = int(item[0])
+                case 'h':
+                    if (TTL_toret.hours != 0):
+                        raise ValueError
+                    TTL_toret.hours = int(item[0])
+                case 'M':
+                    if (TTL_toret.minutes != 0):
+                        raise ValueError
+                    TTL_toret.minutes = int(item[0])
+                case 's':
+                    if (TTL_toret.seconds != 0):
+                        raise ValueError
+                    TTL_toret.seconds = int(item[0])
+        return TTL_toret
+                
+
+def test_TTL():
+    str = "1y3m2w8d10h3M10s"
+    new_str = TTL.from_str(str)
+    print(new_str)
+
+test_TTL()
+
+#####################
 # Individual Commands
 
 ## List
 def handle_list(parsed_args):
     if parsed_args.verbose:
-        print('Listing snapshots for path: {}'.format(parsed_args.btrfs_path))
+        print(f"Listing snapshots for path: {parsed_args.btrfs_path}")
 
-    cmd = "btrfs subvolume list -s {}".format(parsed_args.btrfs_path)
+    cmd = f"btrfs subvolume list -s {parsed_args.btrfs_path}"
     subprocess.run(cmd, shell=True)
 
 ## Destroy
@@ -20,7 +94,52 @@ def handle_destroy(parsed_args):
 ## Create
 def handle_create(parsed_args):
     if parsed_args.verbose:
-        print('Creating snapshot for path: {}'.format(parsed_args.btrfs_path))
+        print(f"Creating snapshot for path: {parsed_args.btrfs_path}")
+
+#####################
+# Helpers
+def create_TTL_string(Years, Months, Weeks, Days, Hours, Minutes, Seconds):
+    str = ""
+    if (Years > 0):
+        str += f"{Years}y"
+    if (Months > 0):
+        str += f"{Months}m"
+    if (Weeks > 0):
+        str += f"{Weeks}w"
+    if (Days > 0):
+        str += f"{Days}d"
+    if (Hours > 0):
+        str += f"{Hours}h"
+    if (Minutes > 0):
+        str += f"{Minutes}M"
+    if (Seconds > 0):
+        str += f"{Seconds}s"
+
+    return str
+
+def convert_TTL_to_Seconds(TTL_str):
+    ttl_in_sec = 0.0
+
+    if ('y' in TTL_str):
+        years = TTL_str.split('y',1)
+        ttl_in_sec += float(years)
+
+    if ('m' in TTL_str):
+        months = TTL_str.split('m',1)
+    
+    if ('w' in TTL_str):
+        weeks = TTL_str.split('w',1)
+    
+    if ('d' in TTL_str):
+        days = TTL_str.split('d',1)
+    
+    if ('M' in TTL_str):
+        minutes = TTL_str.split('M',1)
+    
+    if ('s' in TTL_str):
+        Seconds = TTL_str.split('s',1)
+
+   
 
 
 
@@ -81,7 +200,7 @@ except:
     exit(-1)
 
 if parsed.verbose:
-    print('Parsed Args into: {}'.format(parsed))
+    print(f"Parsed Args into: {parsed}")
 
 match parsed.btrfs_command:
     case "list":
